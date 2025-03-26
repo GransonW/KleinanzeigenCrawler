@@ -8,6 +8,7 @@ from crawl4ai import (
     CacheMode,
     CrawlerRunConfig,
     LLMExtractionStrategy,
+    
 )
 
 from models.venue import Venue
@@ -24,8 +25,10 @@ def get_browser_config() -> BrowserConfig:
     # https://docs.crawl4ai.com/core/browser-crawler-config/
     return BrowserConfig(
         browser_type="chromium",  # Type of browser to simulate
-        headless=False,  # Whether to run in headless mode (no GUI)
+        headless=True,  # Whether to run in headless mode (no GUI)
         verbose=True,  # Enable verbose logging
+        user_agent="random",
+
     )
 
 
@@ -43,9 +46,7 @@ def get_llm_strategy() -> LLMExtractionStrategy:
         schema=Venue.model_json_schema(),  # JSON schema of the data model
         extraction_type="schema",  # Type of extraction to perform
         instruction=(
-            "Extract all venue objects with 'name', 'location', 'price', 'capacity', "
-            "'rating', 'reviews', and a 1 sentence description of the venue from the "
-            "following content."
+            "Extract all Car Names (wihout commas) and Prices objects with 'name', 'price', 'kilometerstand' 'erstzulassung'."
         ),  # Instructions for the LLM
         input_format="markdown",  # Format of the input content
         verbose=True,  # Enable verbose logging
@@ -74,6 +75,9 @@ async def check_no_results(
         config=CrawlerRunConfig(
             cache_mode=CacheMode.BYPASS,
             session_id=session_id,
+            magic=True,
+            simulate_user=True,
+            override_navigator=True
         ),
     )
 
@@ -116,13 +120,14 @@ async def fetch_and_process_page(
             - List[dict]: A list of processed venues from the page.
             - bool: A flag indicating if the "No Results Found" message was encountered.
     """
-    url = f"{base_url}?page={page_number}"
+    url = f"{base_url}seite:{page_number}/c216+autos.marke_s:bmw+autos.model_s:5er+autos.power_i:500%2C"
     print(f"Loading page {page_number}...")
 
     # Check if "No Results Found" message is present
     no_results = await check_no_results(crawler, url, session_id)
     if no_results:
         return [], True  # No more results, signal to stop crawling
+    
 
     # Fetch page content with the extraction strategy
     result = await crawler.arun(
@@ -158,12 +163,12 @@ async def fetch_and_process_page(
         if venue.get("error") is False:
             venue.pop("error", None)  # Remove the 'error' key if it's False
 
-        if not is_complete_venue(venue, required_keys):
-            continue  # Skip incomplete venues
+        #if not is_complete_venue(venue, required_keys):
+        #    continue  # Skip incomplete venues"""
 
-        if is_duplicate_venue(venue["name"], seen_names):
-            print(f"Duplicate venue '{venue['name']}' found. Skipping.")
-            continue  # Skip duplicate venues
+        #if is_duplicate_venue(venue["name"], seen_names):
+        #    print(f"Duplicate venue '{venue['name']}' found. Skipping.")
+        #    continue  # Skip duplicate venues
 
         # Add venue to the list
         seen_names.add(venue["name"])

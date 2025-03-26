@@ -1,5 +1,6 @@
 import asyncio
 
+
 from crawl4ai import AsyncWebCrawler
 from dotenv import load_dotenv
 
@@ -33,6 +34,7 @@ async def crawl_venues():
     # Start the web crawler context
     # https://docs.crawl4ai.com/api/async-webcrawler/#asyncwebcrawler
     async with AsyncWebCrawler(config=browser_config) as crawler:
+
         while True:
             # Fetch and process data from the current page
             venues, no_results_found = await fetch_and_process_page(
@@ -59,7 +61,7 @@ async def crawl_venues():
             page_number += 1  # Move to the next page
 
             # Pause between requests to be polite and avoid rate limits
-            await asyncio.sleep(2)  # Adjust sleep time as needed
+            await asyncio.sleep(10)  # Adjust sleep time as needed
 
     # Save the collected venues to a CSV file
     if all_venues:

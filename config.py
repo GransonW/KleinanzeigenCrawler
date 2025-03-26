@@ -1,13 +1,8 @@
 # config.py
 
-BASE_URL = "https://www.theknot.com/marketplace/wedding-reception-venues-atlanta-ga"
-CSS_SELECTOR = "[class^='info-container']"
+BASE_URL = "https://www.kleinanzeigen.de/s-autos/bmw/"
+CSS_SELECTOR = "[class^='l-container-row contentbox-unpadded no-bg highlighttest']"
 REQUIRED_KEYS = [
-    "name",
-    "price",
-    "location",
-    "capacity",
-    "rating",
-    "reviews",
-    "description",
+    "aditem-main--middle--price-shipping--price",
+    "ellipsis" 
 ]
